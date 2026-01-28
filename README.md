@@ -34,7 +34,7 @@ Created by: **Lordecai**
 pip install speechrecognition edge-tts pygame wikipedia openai python-dotenv
 Microsoft Edge must be installed on your system (required for TTS).
 OpenAI API Key
-The .env file is included in the folder. Replace the placeholder with your real key from OpenAI:
+Create an .env file inside the folder. Replace the placeholder with the actual key you received from OpenAI:
 textOPENAI_API_KEY=sk-proj-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Get your key at: https://platform.openai.com/account/api-keys
 Installation
