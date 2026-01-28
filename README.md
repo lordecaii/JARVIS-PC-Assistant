@@ -33,10 +33,12 @@ Created by: **Lordecai**
 ```bash
 pip install speechrecognition edge-tts pygame wikipedia openai python-dotenv
 Microsoft Edge must be installed on your system (required for TTS).
+
 OpenAI API Key
 Create an .env file inside the folder. Replace the placeholder with the actual key you received from OpenAI:
 textOPENAI_API_KEY=sk-proj-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Get your key at: https://platform.openai.com/account/api-keys
+
 Installation
 Clone the repository or download the files:
 Bashgit clone <repo-url>
@@ -44,6 +46,7 @@ cd jarvis
 Add your OpenAI API key to the .env file (as shown above).
 Install all dependencies at once by opening a terminal ( CMD / PowerShell ) in the project folder and running:
 pip install -r requirements.txt
+
 Usage
 Make sure your microphone is on and working.
 Say "Jarvis" → it replies "Listening, sir."
