@@ -126,7 +126,6 @@ def speak_edge_cli(text, voice="en-GB-RyanNeural"):
         with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as fp:
             temp_file = fp.name
         
-        # Use edge-tts command line tool (more stable)
         cmd = [
             "edge-tts",
             "--voice", voice,
@@ -134,7 +133,6 @@ def speak_edge_cli(text, voice="en-GB-RyanNeural"):
             "--write-media", temp_file
         ]
         
-        # Run with timeout
         result = subprocess.run(
             cmd,
             capture_output=True,
@@ -150,7 +148,6 @@ def speak_edge_cli(text, voice="en-GB-RyanNeural"):
             print(f"❌ Audio file not created")
             return False
         
-        # Play the audio
         pygame.mixer.music.load(temp_file)
         pygame.mixer.music.play()
         
@@ -187,7 +184,6 @@ def test_edge_tts():
     print("="*60)
     
     try:
-        # Check if edge-tts command exists
         result = subprocess.run(
             ["edge-tts", "--version"],
             capture_output=True,
@@ -198,7 +194,6 @@ def test_edge_tts():
         if result.returncode == 0:
             print(f"✅ edge-tts found: {result.stdout.strip()}")
             
-            # Test actual speech generation
             print("   Testing voice generation...")
             if speak_edge_cli("Hi", "en-GB-RyanNeural"):
                 print("✅ Edge TTS is working!")
@@ -505,3 +500,4 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         speak("An error occurred, sir.")
+
