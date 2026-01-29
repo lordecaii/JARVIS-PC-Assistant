@@ -2,6 +2,10 @@
 
 # JARVIS - Personal PC Assistant (English)
 
+> ⚠️ **Platform notice:** This assistant is designed to run on **Windows only**.  
+> Some features rely on Windows-specific application paths and Microsoft Edge.
+
+
 This project is a fully English-speaking local JARVIS assistant powered by **Microsoft Edge TTS** (British English male voice) and **Google Speech-to-Text**. It wakes up with the wake-word "jarvis", then enters a 30-second conversation mode where you can give commands without repeating the wake-word. Each new command resets the timer.
 
 Created by: **Lordecai**
@@ -25,9 +29,11 @@ Created by: **Lordecai**
 
 ## Requirements
 
+- **Windows only** (Windows 10 or later)
 - Python 3.8+
 - Windows (application paths are Windows-specific)
 - **Optional** — To use AI features: Obtain an API key from OpenAI and add some credit balance to your account
+-Microphone
 
 ### Required Libraries
 
@@ -35,18 +41,18 @@ Created by: **Lordecai**
 pip install speechrecognition edge-tts pygame wikipedia openai python-dotenv
 Microsoft Edge must be installed on your system (required for TTS).
 
+
 OpenAI API Key
 Create an .env file inside the folder. Replace the placeholder with the actual key you received from OpenAI:
 textOPENAI_API_KEY=sk-proj-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Get your key at: https://platform.openai.com/account/api-keys
 
 Installation
-Clone the repository or download the files:
-Bashgit clone <repo-url>
-cd jarvis
-Add your OpenAI API key to the .env file (as shown above).
-Install all dependencies at once by opening a terminal ( CMD / PowerShell ) in the project folder and running:
+Open a terminal (CMD/PowerShell) in the project folder and type the following
+cd Desktop\"folder_name"
+Run the following command in the terminal to install all the required libraries at once:
 pip install -r requirements.txt
+Add your OpenAI API key to the .env file (as shown above).
 ```
 
 ## Usage
