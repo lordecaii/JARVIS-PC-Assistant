@@ -13,6 +13,7 @@ Created by: **Lordecai**
 - **Conversation mode**: After saying "Jarvis", you have 30 seconds to issue commands without repeating the wake-word
   - Every new command resets the 30-second timer
   - After 30 seconds of silence, the mode turns off
+- **Microphone selection**: When the code is executed, the available audio devices are displayed on the screen with numbers, and you are prompted to select the microphone you will use by entering its number.
 - Supported commands:
   - Open applications (`open brave`, `start spotify`, `launch vscode`, `open browser`, etc.)
   - Open websites (`open youtube`, `open google`, `open wikipedia`)
