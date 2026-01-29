@@ -81,9 +81,9 @@ AI model: Replace gpt-4o-mini with gpt-4o or another model
 
 ## Known Issues
 
-If microphone sensitivity is low, decrease recognizer.energy_threshold (currently set to 4000 in the code)
-Google Speech-to-Text may sometimes struggle with accents → language="en-US" is configured
-Without an OpenAI API key, only basic (non-AI) commands will work
+-If microphone sensitivity is low, decrease recognizer.energy_threshold (currently set to 4000 in the code)
+-Google Speech-to-Text may sometimes struggle with accents → language="en-US" is configured
+-Without an OpenAI API key, only basic (non-AI) commands will work
 
 Feel free to fork, contribute, report bugs, or request new features.
 
