@@ -47,8 +47,9 @@ cd jarvis
 Add your OpenAI API key to the .env file (as shown above).
 Install all dependencies at once by opening a terminal ( CMD / PowerShell ) in the project folder and running:
 pip install -r requirements.txt
+```
 
-Usage
+## Usage
 Make sure your microphone is on and working.
 Say "Jarvis" → it replies "Listening, sir."
 Then within 30 seconds you can give commands such as:
@@ -72,10 +73,21 @@ Wake-words: Add more entries to the WAKE_WORDS list
 Timeout: Modify CONVERSATION_TIMEOUT = 30 (in seconds)
 AI model: Replace gpt-4o-mini with gpt-4o or another model
 
-Known Issues
+## Known Issues
 
 If microphone sensitivity is low, decrease recognizer.energy_threshold (currently set to 4000 in the code)
 Google Speech-to-Text may sometimes struggle with accents → language="en-US" is configured
 Without an OpenAI API key, only basic (non-AI) commands will work
 
 Feel free to fork, contribute, report bugs, or request new features.
+
+## DISCLAIMER
+
+This is a fan-made, non-commercial software project inspired by J.A.R.V.I.S.
+from Marvel.
+
+J.A.R.V.I.S., Iron Man, and all related names, characters, and concepts are
+trademarks and intellectual property of Marvel Entertainment.
+
+This project is not affiliated with, endorsed by, or sponsored by Marvel.
+No commercial use is intended.
