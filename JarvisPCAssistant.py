@@ -1,8 +1,8 @@
 import os
 import webbrowser
 import speech_recognition as sr
-import edge_tts
 import asyncio
+import subprocess
 import pygame
 import wikipedia
 from openai import OpenAI
@@ -17,8 +17,6 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 WAKE_WORDS = ["jarvis", "jarvi", "jarv", "jar", "ja"]
-
-VOICE = "en-GB-RyanNeural"  # Best British English male neural voice for Jarvis-like tone
 
 APPS = {
     "brave": r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe",
@@ -42,45 +40,117 @@ WORD_REPLACEMENTS = {
     "wikipedia": ["wikipedia", "wiki"],
 }
 
+# ================== MICROPHONE SELECTION (FILTERED) ==================
+
+selected_microphone_index = None
+
+def select_microphone():
+    """Let user select which microphone to use - only shows actual microphones"""
+    global selected_microphone_index
+    
+    print("\n" + "="*60)
+    print("🎤 MICROPHONE SELECTION")
+    print("="*60 + "\n")
+    
+    all_mics = sr.Microphone.list_microphone_names()
+    
+    if not all_mics:
+        print("❌ No microphones found!")
+        return False
+    
+    filtered_mics = []
+    exclude_keywords = [
+        "stereo mix", "what u hear", "wave out", "sum", "output", 
+        "speakers", "headphones", "loopback", "playback"
+    ]
+    
+    for idx, mic_name in enumerate(all_mics):
+        mic_lower = mic_name.lower()
+        if not any(keyword in mic_lower for keyword in exclude_keywords):
+            filtered_mics.append((idx, mic_name))
+    
+    if not filtered_mics:
+        print("❌ No input microphones found!")
+        print("\nShowing all devices instead:\n")
+        for i, mic_name in enumerate(all_mics):
+            print(f"  [{i}] {mic_name}")
+        filtered_mics = [(i, name) for i, name in enumerate(all_mics)]
+    else:
+        print("Available input microphones:\n")
+        for i, (original_idx, mic_name) in enumerate(filtered_mics):
+            print(f"  [{original_idx}] {mic_name}")
+    
+    print("\n" + "-"*60)
+    
+    while True:
+        try:
+            choice = input(f"\nEnter microphone number: ").strip()
+            
+            if choice == "":
+                print("❌ Please enter a number")
+                continue
+            
+            mic_index = int(choice)
+            
+            if 0 <= mic_index < len(all_mics):
+                selected_microphone_index = mic_index
+                print(f"\n✅ Selected: [{mic_index}] {all_mics[mic_index]}\n")
+                print("="*60 + "\n")
+                return True
+            else:
+                print(f"❌ Invalid number. Enter a valid device number.")
+        
+        except ValueError:
+            print("❌ Please enter a valid number")
+        except KeyboardInterrupt:
+            print("\n\n⛔ Cancelled")
+            return False
+
 # ================== CONVERSATION MODE ==================
 
 conversation_mode = False
 last_command_time = 0
-CONVERSATION_TIMEOUT = 30  # seconds
+CONVERSATION_TIMEOUT = 30
 
-# ================== TTS - Edge TTS ==================
+# ================== TTS - Edge TTS (CLI Method - More Reliable) ==================
 
 pygame.mixer.init()
 
-async def create_speech_async(text, output_file, voice):
-    try:
-        communicate = edge_tts.Communicate(text, voice)
-        await communicate.save(output_file)
-        return True
-    except Exception as e:
-        print(f"❌ TTS Creation Error: {e}")
-        return False
-
-def speak(text):
+def speak_edge_cli(text, voice="en-GB-RyanNeural"):
+    """Use edge-tts CLI command instead of Python library"""
     if not text or text.strip() == "":
-        return
+        return False
     
-    print(f"🗣️ JARVIS: {text}")
-    
+    temp_file = None
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as fp:
             temp_file = fp.name
         
-        success = asyncio.run(create_speech_async(text, temp_file, VOICE))
+        # Use edge-tts command line tool (more stable)
+        cmd = [
+            "edge-tts",
+            "--voice", voice,
+            "--text", text,
+            "--write-media", temp_file
+        ]
         
-        if not success:
-            print("❌ Failed to generate speech!")
-            return
+        # Run with timeout
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=15
+        )
+        
+        if result.returncode != 0:
+            print(f"❌ edge-tts error: {result.stderr}")
+            return False
         
         if not os.path.exists(temp_file) or os.path.getsize(temp_file) == 0:
-            print(f"❌ Speech file not created: {temp_file}")
-            return
+            print(f"❌ Audio file not created")
+            return False
         
+        # Play the audio
         pygame.mixer.music.load(temp_file)
         pygame.mixer.music.play()
         
@@ -91,16 +161,77 @@ def speak(text):
         pygame.mixer.music.unload()
         pygame.time.wait(100)
         
-        try:
-            if os.path.exists(temp_file):
-                os.remove(temp_file)
-        except Exception as e:
-            print(f"⚠️ Error deleting file (non-critical): {e}")
-            
+        return True
+        
+    except subprocess.TimeoutExpired:
+        print("❌ edge-tts timeout")
+        return False
+    except FileNotFoundError:
+        print("❌ edge-tts command not found!")
+        print("   Install with: pip install edge-tts")
+        return False
     except Exception as e:
-        print(f"❌ Speech playback error: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"❌ Error: {e}")
+        return False
+    finally:
+        if temp_file and os.path.exists(temp_file):
+            try:
+                time.sleep(0.2)
+                os.remove(temp_file)
+            except:
+                pass
+
+def test_edge_tts():
+    """Test if edge-tts is working"""
+    print("\n🔍 Testing Edge TTS...")
+    print("="*60)
+    
+    try:
+        # Check if edge-tts command exists
+        result = subprocess.run(
+            ["edge-tts", "--version"],
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+        
+        if result.returncode == 0:
+            print(f"✅ edge-tts found: {result.stdout.strip()}")
+            
+            # Test actual speech generation
+            print("   Testing voice generation...")
+            if speak_edge_cli("Hi", "en-GB-RyanNeural"):
+                print("✅ Edge TTS is working!")
+                print("   Voice: en-GB-RyanNeural (British Male)")
+                return True
+            else:
+                print("❌ Voice generation failed")
+                return False
+        else:
+            print("❌ edge-tts not working properly")
+            return False
+            
+    except FileNotFoundError:
+        print("❌ edge-tts not installed!")
+        print("\n💡 Install with:")
+        print("   pip uninstall edge-tts")
+        print("   pip install edge-tts --upgrade")
+        return False
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return False
+
+def speak(text):
+    """Main speak function using edge-tts CLI"""
+    if not text or text.strip() == "":
+        return
+    
+    print(f"🗣️ JARVIS: {text}")
+    
+    success = speak_edge_cli(text, "en-GB-RyanNeural")
+    
+    if not success:
+        print("⚠️ Speech failed - continuing in text mode")
 
 # ================== OPENAI ==================
 
@@ -134,7 +265,10 @@ recognizer.pause_threshold = 0.8
 
 def get_microphone():
     try:
-        return sr.Microphone()
+        if selected_microphone_index is not None:
+            return sr.Microphone(device_index=selected_microphone_index)
+        else:
+            return sr.Microphone()
     except Exception as e:
         print(f"Microphone error: {e}")
         return None
@@ -277,42 +411,34 @@ def handle_date(text):
         return True
     return False
 
-# ================== VOICE TEST FUNCTION ==================
-
-async def test_voice():
-    print("\n" + "="*60)
-    print("🔊 VOICE TEST IN PROGRESS...")
-    print("="*60 + "\n")
-    
-    print(f"Current voice: {VOICE}")
-    
-    try:
-        voices = await edge_tts.list_voices()
-        english_voices = [v for v in voices if v["Locale"].startswith("en-")]
-        
-        print("\nAvailable English voices:")
-        for v in english_voices:
-            emoji = "👨" if v["Gender"] == "Male" else "👩"
-            marker = "✓ IN USE" if v["ShortName"] == VOICE else ""
-            print(f"{emoji} {v['ShortName']} ({v['Gender']}) {marker}")
-    except Exception as e:
-        print(f"Could not list voices: {e}")
-    
-    print("\n" + "="*60 + "\n")
-
 # ================== MAIN LOOP ==================
 
 def main():
+    if not select_microphone():
+        print("\n❌ No microphone selected. Exiting...\n")
+        return
+    
     print("\n" + "="*60)
     print("🤖 JARVIS - Conversation Mode Active")
     print("="*60 + "\n")
     
-    try:
-        asyncio.run(test_voice())
-    except Exception as e:
-        print(f"⚠️ Voice test failed: {e}")
+    # Test Edge TTS
+    if not test_edge_tts():
+        print("\n⚠️ WARNING: Edge TTS is not working!")
+        print("   Trying to fix...")
+        print("\n   Run these commands:")
+        print("   1. pip uninstall edge-tts")
+        print("   2. pip install edge-tts --upgrade")
+        print("   3. Restart the program")
+        
+        response = input("\n   Continue anyway? (y/n): ").lower()
+        if response != 'y':
+            return
+    
+    print("\n" + "="*60 + "\n")
     
     speak("Jarvis online, sir.")
+    
     global conversation_mode, last_command_time
     running = True
     
@@ -352,7 +478,7 @@ def main():
             continue
         
         handled = False
-        
+       
         if handle_date(command): handled = True
         elif handle_time(command): handled = True
         elif "open" in command or "start" in command or "launch" in command:
@@ -375,7 +501,7 @@ if __name__ == "__main__":
         print("\n\n⛔ Shutting down program...")
         speak("Shutting down.")
     except Exception as e:
-        print(f"\n❌ ERROR: {e}")
+        print("\n❌ ERROR: {e}")
         import traceback
         traceback.print_exc()
         speak("An error occurred, sir.")
