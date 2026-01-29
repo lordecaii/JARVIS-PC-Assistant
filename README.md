@@ -89,11 +89,11 @@ Feel free to fork, contribute, report bugs, or request new features.
 
 ## DISCLAIMER
 
-This is a fan-made, non-commercial software project inspired by J.A.R.V.I.S.
-from Marvel.
+This is a **fan-made, non-commercial** software project inspired by J.A.R.V.I.S. from Marvel's Iron Man.
 
-J.A.R.V.I.S., Iron Man, and all related names, characters, and concepts are
-trademarks and intellectual property of Marvel Entertainment.
+J.A.R.V.I.S., Iron Man, and all related names, characters, and concepts are **trademarks** and **intellectual property** of Marvel Entertainment / Disney.
 
-This project is not affiliated with, endorsed by, or sponsored by Marvel.
-No commercial use is intended.
+This project is **not affiliated with, endorsed by, or sponsored by** Marvel or any related entities.  
+**No commercial use is intended.**
+
+All rights to the original characters and concepts belong to their respective owners.
