@@ -44,7 +44,7 @@ Microsoft Edge must be installed on your system (required for TTS).
 
 OpenAI API Key
 Create an .env file inside the folder. Replace the placeholder with the actual key you received from OpenAI:
-textOPENAI_API_KEY=sk-proj-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+OPENAI_API_KEY=sk-proj-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Get your key at: https://platform.openai.com/account/api-keys
 
 Installation
